@@ -1,5 +1,9 @@
 import time
 import ure
+import machine
+
+# Set CPU frequency to 250MHz
+machine.freq(250000000)
 
 def parse_mul_instructions(input_file: str) -> int:
     """

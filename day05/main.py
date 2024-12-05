@@ -1,5 +1,9 @@
 import gc
 import time
+import machine
+
+# Set CPU frequency to 250MHz
+machine.freq(250000000)
 
 def read_input_stream(filename: str):
     """Generator-based input reader to minimize memory usage."""

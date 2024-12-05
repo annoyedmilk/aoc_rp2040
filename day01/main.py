@@ -1,4 +1,8 @@
 import time
+import machine
+
+# Set CPU frequency to 250MHz
+machine.freq(250000000)
 
 def calculate_distance(input_file: str) -> int:
     """
