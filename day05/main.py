@@ -59,50 +59,40 @@ def get_middle_page(update: list[int]) -> int:
     """Get middle page number."""
     return update[len(update) // 2]
 
-def solve_parts(filename: str) -> tuple[int, int]:
-    """Solve both parts in a single pass to save memory."""
-    rules = process_rules(filename)
-    gc.collect()  # Collect after processing rules
-    
-    total_part1 = 0
-    total_part2 = 0
-    
-    # Skip rules section
-    found_updates = False
-    for update in read_input_stream(filename):
-        if not found_updates:
-            if len(update) != 2:
-                found_updates = True
-            else:
-                continue
-        
-        # Part 1 processing
-        if is_update_valid(rules, update):
-            total_part1 += get_middle_page(update)
-        else:
-            # Part 2 processing - only for invalid updates
-            reordered = []
-            remaining = update.copy()
-            
-            while remaining:
-                for page in update:  # use original update for order
-                    if page not in remaining:
-                        continue
-                    can_add = True
-                    for b, a in rules:
-                        if a == page and b in remaining:
-                            can_add = False
+def solve_part1(rules, updates_gen):
+    """Solve part 1 separately."""
+    total = 0
+    for update in updates_gen:
+        if len(update) != 2:  # Skip rule pairs
+            if is_update_valid(rules, update):
+                total += get_middle_page(update)
+    return total
+
+def solve_part2(rules, updates_gen):
+    """Solve part 2 separately."""
+    total = 0
+    for update in updates_gen:
+        if len(update) != 2:  # Skip rule pairs
+            if not is_update_valid(rules, update):
+                reordered = []
+                remaining = update.copy()
+                
+                while remaining:
+                    for page in update:
+                        if page not in remaining:
+                            continue
+                        can_add = True
+                        for b, a in rules:
+                            if a == page and b in remaining:
+                                can_add = False
+                                break
+                        if can_add:
+                            reordered.append(page)
+                            remaining.remove(page)
                             break
-                    if can_add:
-                        reordered.append(page)
-                        remaining.remove(page)
-                        break
-            
-            total_part2 += get_middle_page(reordered)
-        
-        gc.collect()  # Collect after processing each update
-    
-    return total_part1, total_part2
+                
+                total += get_middle_page(reordered)
+    return total
 
 def main():
     input_file = 'input.txt'
@@ -111,16 +101,29 @@ def main():
     # Clear memory before starting
     gc.collect()
     
-    start_time = time.ticks_ms()
     try:
-        result_part1, result_part2 = solve_parts(input_file)
-        duration = time.ticks_diff(time.ticks_ms(), start_time)
+        # Process rules first
+        rules = process_rules(input_file)
+        gc.collect()
+        
+        # Part 1
+        start_time1 = time.ticks_ms()
+        result_part1 = solve_part1(rules, read_input_stream(input_file))
+        duration1 = time.ticks_diff(time.ticks_ms(), start_time1)
+        
+        gc.collect()  # Clean up between parts
+        
+        # Part 2
+        start_time2 = time.ticks_ms()
+        result_part2 = solve_part2(rules, read_input_stream(input_file))
+        duration2 = time.ticks_diff(time.ticks_ms(), start_time2)
         
         print("Advent of Code 2040 - Day 5")
-        print("Solver: annoyedmilk (RP2040 Optimized)")
+        print("Solver: annoyedmilk")
         print(f"Part 1 - Sum of middle pages in valid updates: {result_part1}")
+        print(f"Part 1 - Execution time: {duration1 / 1000:.4f} seconds")
         print(f"Part 2 - Sum of middle pages in reordered updates: {result_part2}")
-        print(f"Total execution time: {duration / 1000:.4f} seconds")
+        print(f"Part 2 - Execution time: {duration2 / 1000:.4f} seconds")
         
     except MemoryError as e:
         print("Memory error occurred:", e)
