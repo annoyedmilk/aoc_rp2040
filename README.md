@@ -7,7 +7,7 @@ Solutions for Advent of Code 2040 challenges, optimized to run on the RP2040 mic
 | 2 | ✅ 463 (0.99s) | ✅ 514 (1.86s) |
 | 3 | ✅ 169021493 (5.37s) | ✅ 111762583 (6.62s) |
 | 4 | ✅ 2593 (100.73s) | ✅ 1950 (5.13s) |
-| 5 | ✅ 4766 (45.50s) | ✅ 6257 (45.50s) |
+| 5 | ✅ 4766 (16.72s) | ✅ 6257 (37.89s) |
 ## 🔧 Hardware Requirements
 - Raspberry Pi Pico (i use the offical pico W)
 - MicroPython firmware installed (https://github.com/annoyedmilk/aoc_rp2040/tree/main/firmware)
