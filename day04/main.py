@@ -4,6 +4,16 @@ import machine
 # Set CPU frequency to 250MHz
 machine.freq(250000000)
 
+# Pre-computed constants
+DIRS = [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]
+XMAS = "XMAS"
+PATTERNS = (
+    (('M','A','S'), ('M','A','S')),
+    (('M','A','S'), ('S','A','M')),
+    (('S','A','M'), ('M','A','S')),
+    (('S','A','M'), ('S','A','M'))
+)
+
 def read_input(filename: str) -> list[str]:
     """
     Read the input file and return a list of lines.
@@ -15,7 +25,30 @@ def read_input(filename: str) -> list[str]:
         list[str]: The lines from the input file.
     """
     with open(filename) as f:
-        return [line.strip() for line in f if all(c in 'XMAS' for c in line.strip())]
+        return [line.strip() for line in f if all(c in XMAS for c in line.strip())]
+
+def check(x: int, y: int, dx: int, dy: int, R: int, C: int, grid: list[str]) -> bool:
+    """
+    Check if there is a valid XMAS sequence starting at (x,y) in direction (dx,dy).
+    
+    Args:
+        x, y (int): Starting coordinates
+        dx, dy (int): Direction vector
+        R, C (int): Grid dimensions
+        grid (list[str]): The character grid
+        
+    Returns:
+        bool: True if valid XMAS sequence found
+    """
+    end_x = x + 3 * dx
+    end_y = y + 3 * dy
+    if not (0 <= end_x < R and 0 <= end_y < C):
+        return False
+    
+    for i in range(4):
+        if grid[x + i * dx][y + i * dy] != XMAS[i]:
+            return False
+    return True
 
 def count_xmas_occurrences(grid: list[str]) -> int:
     """
@@ -27,17 +60,11 @@ def count_xmas_occurrences(grid: list[str]) -> int:
     Returns:
         int: The number of XMAS occurrences.
     """
-    dirs = [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]
     R, C = len(grid), len(grid[0])
-
-    def check(x: int, y: int, dx: int, dy: int) -> bool:
-        return all(0 <= x + i * dx < R and 0 <= y + i * dy < C and
-                   grid[x + i * dx][y + i * dy] == "XMAS"[i] for i in range(4))
-
-    return sum(check(i, j, dx, dy)
-               for i in range(R)
-               for j in range(C)
-               for dx, dy in dirs)
+    return sum(check(i, j, dx, dy, R, C, grid)
+              for i in range(R)
+              for j in range(C)
+              for dx, dy in DIRS)
 
 def check_xmas_pattern(grid: list[str], r: int, c: int) -> bool:
     """
@@ -53,13 +80,17 @@ def check_xmas_pattern(grid: list[str], r: int, c: int) -> bool:
     """
     if r < 1 or r >= len(grid) - 1 or c < 1 or c >= len(grid[0]) - 1:
         return False
-
-    patterns = [('MAS', 'MAS'), ('MAS', 'SAM'), ('SAM', 'MAS'), ('SAM', 'SAM')]
-    for p1, p2 in patterns:
-        if (grid[r-1][c-1] == p1[0] and grid[r][c] == p1[1] and grid[r+1][c+1] == p1[2] and
-            grid[r-1][c+1] == p2[0] and grid[r][c] == p2[1] and grid[r+1][c-1] == p2[2]):
-            return True
-    return False
+        
+    # Early exit if center isn't 'A'
+    center = grid[r][c]
+    if center != 'A':
+        return False
+        
+    # Create tuples for current pattern
+    diag1 = (grid[r-1][c-1], center, grid[r+1][c+1])
+    diag2 = (grid[r-1][c+1], center, grid[r+1][c-1])
+    
+    return (diag1, diag2) in PATTERNS
 
 def count_xmas_patterns(grid: list[str]) -> int:
     """
@@ -72,8 +103,8 @@ def count_xmas_patterns(grid: list[str]) -> int:
         int: The number of X-MAS patterns.
     """
     return sum(check_xmas_pattern(grid, r, c)
-               for r in range(1, len(grid) - 1)
-               for c in range(1, len(grid[0]) - 1))
+              for r in range(1, len(grid) - 1)
+              for c in range(1, len(grid[0]) - 1))
 
 def main():
     input_file = 'input.txt'
