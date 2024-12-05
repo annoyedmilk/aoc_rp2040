@@ -1,6 +1,6 @@
-# Advent of Code 2040 - RP2040 MicroPython Solutions
+# Advent of Code 2024 - RP2040 MicroPython Solutions
 
-Solutions for Advent of Code 2040 challenges, optimized to run on the RP2040 microcontroller using MicroPython. These solutions focus on minimal memory usage and efficient processing while maintaining reasonable execution times.
+Solutions for Advent of Code 2024 challenges, optimized to run on the RP2040 microcontroller using MicroPython. These solutions focus on minimal memory usage and efficient processing while maintaining reasonable execution times.
 
 ## 🎄 Current Progress
 
@@ -53,14 +53,14 @@ The solutions are designed to run within the RP2040's 264KB RAM limitation:
 ```
 aoc_rp2040/
 ├── day1/
-│   ├── solution.py
+│   ├── main.py
 │   └── input.txt
 ├── day2/
-│   ├── solution.py
+│   ├── main.py
 │   └── input.txt
 ...
 └── day5/
-    ├── solution.py
+    ├── main.py
     └── input.txt
 ```
 
